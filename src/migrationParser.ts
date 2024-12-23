@@ -83,7 +83,9 @@ function extractTableLines(codeBlock: string): string[] {
  */
 function parseDropColumn(line: string): string[] | null {
   const match = line.match(/\$table->dropColumn\(([^)]+)\)/);
-  if (!match) return null;
+  if (!match) {
+    return null;
+  }
 
   // Внутри могут быть несколько аргументов: 'one', 'two'
   const rawArgs = match[1].trim();
@@ -104,7 +106,9 @@ function parseForeignKey(line: string) {
   const foreignMatch = line.match(
     /\$table->foreign\(['"`]([^'"`]+)['"`]\)(.*)/,
   );
-  if (!foreignMatch) return null;
+  if (!foreignMatch) {
+    return null;
+  }
 
   const columnName = foreignMatch[1];
   const chain = foreignMatch[2]; // ->references('id')->on('users')->onDelete('cascade') ...
@@ -153,7 +157,9 @@ function parseAddOrModifyColumn(line: string): ColumnDefinition | null {
   // mainMatch[2] = "'name', 255"
   // mainMatch[3] = "->nullable()->default('test')"
   const mainMatch = line.match(/\$table->(\w+)\(([^)]*)\)(.*)/);
-  if (!mainMatch) return null;
+  if (!mainMatch) {
+    return null;
+  }
 
   const columnType = mainMatch[1];
   const argsString = mainMatch[2];

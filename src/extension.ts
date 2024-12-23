@@ -1,17 +1,15 @@
 import * as vscode from 'vscode';
-import { parseMigrations, TableDefinition } from './migrationParser'; // Импортируйте ваш парсер миграций и определение таблицы
+import { parseMigrations, TableDefinition } from './migrationParser';
 
 export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
     'laravelui.showDatabaseStructure',
     async () => {
-      // Проверяем, открыто ли рабочее пространство
       if (!vscode.workspace.workspaceFolders) {
         vscode.window.showErrorMessage('Рабочее пространство не открыто.');
         return;
       }
 
-      // Получаем путь к первой папке в рабочем пространстве
       const workspaceFolders = vscode.workspace.workspaceFolders;
       let migrationsPath = '';
       if (workspaceFolders && workspaceFolders.length > 0) {
@@ -19,6 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
         migrationsPath = `${firstFolderPath}/database/migrations`;
       } else {
         vscode.window.showErrorMessage('Рабочая папка не открыта');
+        return;
       }
 
       try {
@@ -55,40 +54,56 @@ function getWebviewContent(dbStructure: TableDefinition[]): string {
   const tablesHtml = dbStructure
     .map(
       (table) => `
-    <h2>Таблица: ${table.name}</h2>
-    <table>
-      <tr>
-        <th>Название столбца</th>
-        <th>Тип</th>
-        <th>Nullable</th>
-        <th>Unique</th>
-        <th>Primary</th>
-        <th>Default</th>
-        <th>Связи</th>
-      </tr>
-      ${table.columns
-        .map(
-          (column) => `
-        <tr>
-          <td>${column.name}</td>
-          <td>${column.type}</td>
-          <td>${column.nullable ? 'Да' : 'Нет'}</td>
-          <td>${column.unique ? 'Да' : 'Нет'}</td>
-          <td>${column.primary ? 'Да' : 'Нет'}</td>
-          <td>${column.default || ''}</td>
-          <td>${
-            column.references
-              ? `Таблица: ${column.references.table}, Колонка: ${
-                  column.references.column || 'id'
-                }`
-              : ''
-          }</td>
-        </tr>
+        <vscode-collapsible>
+          <vscode-collapsible-header>${table.name}</vscode-collapsible-header>
+          <vscode-collapsible-content>
+            <vscode-data-grid grid-template-columns="1fr 1fr 1fr 1fr 1fr 1fr 1fr">
+              <vscode-data-grid-row row-type="header">
+                <vscode-data-grid-cell cell-type="columnheader" grid-column="1">Название столбца</vscode-data-grid-cell>
+                <vscode-data-grid-cell cell-type="columnheader" grid-column="2">Тип</vscode-data-grid-cell>
+                <vscode-data-grid-cell cell-type="columnheader" grid-column="3">Nullable</vscode-data-grid-cell>
+                <vscode-data-grid-cell cell-type="columnheader" grid-column="4">Unique</vscode-data-grid-cell>
+                <vscode-data-grid-cell cell-type="columnheader" grid-column="5">Primary</vscode-data-grid-cell>
+                <vscode-data-grid-cell cell-type="columnheader" grid-column="6">Default</vscode-data-grid-cell>
+                <vscode-data-grid-cell cell-type="columnheader" grid-column="7">Связи</vscode-data-grid-cell>
+              </vscode-data-grid-row>
+              ${table.columns
+                .map(
+                  (column) => `
+                    <vscode-data-grid-row>
+                      <vscode-data-grid-cell grid-column="1">${
+                        column.name
+                      }</vscode-data-grid-cell>
+                      <vscode-data-grid-cell grid-column="2">${
+                        column.type
+                      }</vscode-data-grid-cell>
+                      <vscode-data-grid-cell grid-column="3">${
+                        column.nullable ? 'Да' : 'Нет'
+                      }</vscode-data-grid-cell>
+                      <vscode-data-grid-cell grid-column="4">${
+                        column.unique ? 'Да' : 'Нет'
+                      }</vscode-data-grid-cell>
+                      <vscode-data-grid-cell grid-column="5">${
+                        column.primary ? 'Да' : 'Нет'
+                      }</vscode-data-grid-cell>
+                      <vscode-data-grid-cell grid-column="6">${
+                        column.default || ''
+                      }</vscode-data-grid-cell>
+                      <vscode-data-grid-cell grid-column="7">${
+                        column.references
+                          ? `Таблица: ${column.references.table}, Колонка: ${
+                              column.references.column || 'id'
+                            }`
+                          : ''
+                      }</vscode-data-grid-cell>
+                    </vscode-data-grid-row>
+                  `,
+                )
+                .join('')}
+            </vscode-data-grid>
+          </vscode-collapsible-content>
+        </vscode-collapsible>
       `,
-        )
-        .join('')}
-    </table>
-  `,
     )
     .join('');
 
@@ -98,11 +113,11 @@ function getWebviewContent(dbStructure: TableDefinition[]): string {
     <head>
       <meta charset="UTF-8">
       <title>Структура базы данных Laravel</title>
+      <script type="module" src="https://unpkg.com/@vscode/webview-ui-toolkit@1.4.0/dist/toolkit.min.js"></script>
       <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f4f4f4; }
+        body { font-family: var(--vscode-font-family); padding: 20px; }
+        vscode-data-grid { width: 100%; margin-bottom: 20px; }
+        vscode-collapsible { margin-bottom: 10px; }
       </style>
     </head>
     <body>
