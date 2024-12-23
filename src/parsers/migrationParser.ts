@@ -1,31 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-
-/**
- * Описание одного столбца таблицы
- */
-interface ColumnDefinition {
-  name: string;
-  type: string;
-  nullable?: boolean;
-  unique?: boolean;
-  primary?: boolean;
-  default?: string;
-  references?: {
-    table: string;
-    column: string; // Обычно "id"
-    onDelete?: string;
-    onUpdate?: string;
-  };
-}
-
-/**
- * Описание структуры одной таблицы
- */
-export interface TableDefinition {
-  name: string;
-  columns: ColumnDefinition[];
-}
+import { ColumnDefinition, TableDefinition } from '../types';
 
 /**
  * Хранилище всех таблиц.
