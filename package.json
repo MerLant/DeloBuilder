@@ -1,10 +1,17 @@
 {
-  "name": "laravelui",
-  "displayName": "LaravelUI",
+  "name": "delobuilder",
+  "displayName": "DeloBuilder",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.96.0"
+  },
+  "icon": "images/icon.png",
+  "publisher": "delobuilder",
+  "pricing": "Free",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MerLant/DeloBuilder.git"
   },
   "categories": [
     "Other"
